@@ -252,11 +252,30 @@ TEST(FigureArrayTest, AssignmentOperator) {
 
 // Тесты граничных случаев
 TEST(EdgeCasesTest, ZeroArea) {
-    Trapezoid t(0.0, 0.0, 1.0, 0.0, 0.0);
-    EXPECT_DOUBLE_EQ(t.getArea(), 0.0);
+    // После добавления валидации, нулевые значения должны выбрасывать исключение
+    EXPECT_THROW(Trapezoid(0.0, 0.0, 1.0, 0.0, 0.0), std::invalid_argument);
+}
+
+TEST(EdgeCasesTest, NegativeValues) {
+    // Отрицательные основания/высота должны выбрасывать исключение
+    EXPECT_THROW(Trapezoid(-2.0, 4.0, 3.0, 0.0, 0.0), std::invalid_argument);
+    EXPECT_THROW(Trapezoid(2.0, -4.0, 3.0, 0.0, 0.0), std::invalid_argument);
+    EXPECT_THROW(Trapezoid(2.0, 4.0, -3.0, 0.0, 0.0), std::invalid_argument);
+
+    // Отрицательная сторона ромба
+    EXPECT_THROW(Rhombus(-2.0, 1.57, 0.0, 0.0), std::invalid_argument);
+
+    // Отрицательная сторона пятиугольника
+    EXPECT_THROW(Pentagon(-2.0, 0.0, 0.0), std::invalid_argument);
+
+    // Неверный угол ромба (должен быть в диапазоне (0, π))
+    EXPECT_THROW(Rhombus(2.0, 0.0, 0.0, 0.0), std::invalid_argument);
+    EXPECT_THROW(Rhombus(2.0, M_PI, 0.0, 0.0), std::invalid_argument);
+    EXPECT_THROW(Rhombus(2.0, -1.57, 0.0, 0.0), std::invalid_argument);
 }
 
 TEST(EdgeCasesTest, NegativeCoordinates) {
+    // Отрицательные координаты центра - это ОК
     Trapezoid t(2.0, 4.0, 3.0, -1.0, -2.0);
     auto center = t.getCenter();
     EXPECT_DOUBLE_EQ(center[0], -1.0);
