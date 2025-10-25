@@ -1,9 +1,14 @@
 #include "Pentagon.h"
 #include <cmath>
+#include <stdexcept>
 
 // Конструкторы
-Pentagon::Pentagon(double s, double x, double y) 
-    : Figure("Пятиугольник"), side(s), x(x), y(y) {}
+Pentagon::Pentagon(double s, double x, double y)
+    : Figure("Пятиугольник"), side(s), x(x), y(y) {
+    if (s <= 0) {
+        throw std::invalid_argument("Pentagon: сторона должна быть положительной");
+    }
+}
 
 Pentagon::Pentagon(const Pentagon& other) 
     : Figure(other), side(other.side), x(other.x), y(other.y) {}

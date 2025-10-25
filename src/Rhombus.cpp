@@ -1,9 +1,17 @@
 #include "Rhombus.h"
 #include <cmath>
+#include <stdexcept>
 
 // Конструкторы
-Rhombus::Rhombus(double s, double a, double x, double y) 
-    : Figure("Ромб"), side(s), angle(a), x(x), y(y) {}
+Rhombus::Rhombus(double s, double a, double x, double y)
+    : Figure("Ромб"), side(s), angle(a), x(x), y(y) {
+    if (s <= 0) {
+        throw std::invalid_argument("Rhombus: сторона должна быть положительной");
+    }
+    if (a <= 0 || a >= M_PI) {
+        throw std::invalid_argument("Rhombus: угол должен быть в диапазоне (0, π)");
+    }
+}
 
 Rhombus::Rhombus(const Rhombus& other) 
     : Figure(other), side(other.side), angle(other.angle), x(other.x), y(other.y) {}
@@ -53,18 +61,23 @@ double Rhombus::getArea() const {
 }
 
 void Rhombus::printVertices(std::ostream& os) const {
-    double halfSide = side / 2.0;
-    
-    // Вычисляем координаты вершин ромба
+    // Диагонали ромба через сторону и угол:
+    // d1 = 2 * side * sin(angle/2)
+    // d2 = 2 * side * cos(angle/2)
+    double halfD1 = side * sin(angle / 2.0);
+    double halfD2 = side * cos(angle / 2.0);
+
+    // Вершины ромба относительно центра (x, y)
+    // Диагонали расположены вдоль осей координат
     double x1 = x;
-    double y1 = y + halfSide;
-    double x2 = x + halfSide * cos(angle);
-    double y2 = y + halfSide * sin(angle);
+    double y1 = y + halfD1;  // верхняя вершина
+    double x2 = x + halfD2;
+    double y2 = y;           // правая вершина
     double x3 = x;
-    double y3 = y - halfSide;
-    double x4 = x - halfSide * cos(angle);
-    double y4 = y - halfSide * sin(angle);
-    
+    double y3 = y - halfD1;  // нижняя вершина
+    double x4 = x - halfD2;
+    double y4 = y;           // левая вершина
+
     os << "(" << x1 << ", " << y1 << ") ";
     os << "(" << x2 << ", " << y2 << ") ";
     os << "(" << x3 << ", " << y3 << ") ";

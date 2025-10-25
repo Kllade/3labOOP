@@ -1,5 +1,6 @@
 #include <iostream>
 #include <memory>
+#include <limits>
 #include "Figure.h"
 #include "Trapezoid.h"
 #include "Rhombus.h"
@@ -22,33 +23,53 @@ void printMenu() {
 }
 
 std::unique_ptr<Figure> createFigure(int type) {
-    switch (type) {
-        // Трапеция
-        case 1: { 
-            double top, bottom, height, x, y;
-            std::cout << "Введите параметры трапеции (верхнее основание, нижнее основание, высота, x, y): ";
-            std::cin >> top >> bottom >> height >> x >> y;
-            std::cin.ignore(); 
-            return std::make_unique<Trapezoid>(top, bottom, height, x, y);
+    try {
+        switch (type) {
+            // Трапеция
+            case 1: {
+                double top, bottom, height, x, y;
+                std::cout << "Введите параметры трапеции (верхнее основание, нижнее основание, высота, x, y): ";
+                if (!(std::cin >> top >> bottom >> height >> x >> y)) {
+                    std::cin.clear();
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                    std::cout << "Ошибка: некорректный ввод данных!" << std::endl;
+                    return nullptr;
+                }
+                std::cin.ignore();
+                return std::make_unique<Trapezoid>(top, bottom, height, x, y);
+            }
+            // Ромб
+            case 2: {
+                double side, angle, x, y;
+                std::cout << "Введите параметры ромба (сторона, угол, x, y): ";
+                if (!(std::cin >> side >> angle >> x >> y)) {
+                    std::cin.clear();
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                    std::cout << "Ошибка: некорректный ввод данных!" << std::endl;
+                    return nullptr;
+                }
+                std::cin.ignore();
+                return std::make_unique<Rhombus>(side, angle, x, y);
+            }
+            // 5-угольник
+            case 3: {
+                double side, x, y;
+                std::cout << "Введите параметры пятиугольника (сторона, x, y): ";
+                if (!(std::cin >> side >> x >> y)) {
+                    std::cin.clear();
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                    std::cout << "Ошибка: некорректный ввод данных!" << std::endl;
+                    return nullptr;
+                }
+                std::cin.ignore();
+                return std::make_unique<Pentagon>(side, x, y);
+            }
+            default:
+                return nullptr;
         }
-        // Ромб
-        case 2: { 
-            double side, angle, x, y;
-            std::cout << "Введите параметры ромба (сторона, угол, x, y): ";
-            std::cin >> side >> angle >> x >> y;
-            std::cin.ignore(); 
-            return std::make_unique<Rhombus>(side, angle, x, y);
-        }
-        // 5-угольник
-        case 3: { 
-            double side, x, y;
-            std::cout << "Введите параметры пятиугольника (сторона, x, y): ";
-            std::cin >> side >> x >> y;
-            std::cin.ignore(); 
-            return std::make_unique<Pentagon>(side, x, y);
-        }
-        default:
-            return nullptr;
+    } catch (const std::exception& e) {
+        std::cout << "Ошибка создания фигуры: " << e.what() << std::endl;
+        return nullptr;
     }
 }
 
@@ -60,7 +81,12 @@ int main() {
     
     while (true) {
         printMenu();
-        std::cin >> choice;
+        if (!(std::cin >> choice)) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Ошибка: введите число!" << std::endl;
+            continue;
+        }
         std::cin.ignore(); // Очищаем буфер 
         
         switch (choice) {
@@ -110,7 +136,12 @@ int main() {
                 } else {
                     size_t index;
                     std::cout << "Введите индекс для удаления (0-" << figures.size() - 1 << "): ";
-                    std::cin >> index;
+                    if (!(std::cin >> index)) {
+                        std::cin.clear();
+                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                        std::cout << "Ошибка: введите число!" << std::endl;
+                        break;
+                    }
                     if (index < figures.size()) {
                         figures.removeFigure(index);
                         std::cout << "Фигура успешно удалена!" << std::endl;
@@ -123,28 +154,43 @@ int main() {
             case 9: {
                 std::cout << "Введите тип фигуры (1-Трапеция, 2-Ромб, 3-Пятиугольник): ";
                 int type;
-                std::cin >> type;
-                
-                std::unique_ptr<Figure> figure;
-                switch (type) {
-                    case 1:
-                        figure = std::make_unique<Trapezoid>();
-                        break;
-                    case 2:
-                        figure = std::make_unique<Rhombus>();
-                        break;
-                    case 3:
-                        figure = std::make_unique<Pentagon>();
-                        break;
-                    default:
-                        std::cout << "Неверный тип фигуры!" << std::endl;
-                        continue;
+                if (!(std::cin >> type)) {
+                    std::cin.clear();
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                    std::cout << "Ошибка: некорректный ввод!" << std::endl;
+                    break;
                 }
-                
-                std::cout << "Введите данные фигуры: ";
-                std::cin >> *figure;
-                figures.addFigure(std::move(figure));
-                std::cout << "Фигура успешно добавлена!" << std::endl;
+
+                std::unique_ptr<Figure> figure;
+                try {
+                    switch (type) {
+                        case 1:
+                            figure = std::make_unique<Trapezoid>();
+                            break;
+                        case 2:
+                            figure = std::make_unique<Rhombus>();
+                            break;
+                        case 3:
+                            figure = std::make_unique<Pentagon>();
+                            break;
+                        default:
+                            std::cout << "Неверный тип фигуры!" << std::endl;
+                            continue;
+                    }
+
+                    std::cout << "Введите данные фигуры: ";
+                    std::cin >> *figure;
+                    if (std::cin.fail()) {
+                        std::cin.clear();
+                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                        std::cout << "Ошибка: некорректный ввод данных!" << std::endl;
+                        break;
+                    }
+                    figures.addFigure(std::move(figure));
+                    std::cout << "Фигура успешно добавлена!" << std::endl;
+                } catch (const std::exception& e) {
+                    std::cout << "Ошибка: " << e.what() << std::endl;
+                }
                 break;
             }
             case 0: {

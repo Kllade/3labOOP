@@ -33,15 +33,12 @@ public:
     void printAllFigures() const;
     void printCenters() const;
     void printAreas() const;
-    
-    // Операторы доступа
-    Figure* operator[](size_t index) const;
-    
+
     // Итераторы
     auto begin() { return figures.begin(); }
     auto end() { return figures.end(); }
-    auto begin() const { return figures.begin(); }
-    auto end() const { return figures.end(); }
+    auto begin() const { return figures.cbegin(); }
+    auto end() const { return figures.cend(); }
 };
 
 #endif // FIGUREARRAY_H

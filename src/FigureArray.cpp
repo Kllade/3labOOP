@@ -95,8 +95,3 @@ void FigureArray::printAreas() const {
         std::cout << "Площадь фигуры " << i + 1 << ": " << figures[i]->getArea() << std::endl;
     }
 }
-
-// Оператор доступа
-Figure* FigureArray::operator[](size_t index) const {
-    return getFigure(index);
-}

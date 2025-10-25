@@ -28,6 +28,8 @@ public:
     std::vector<double> getCenter() const override;
     double getArea() const override;
     void printVertices(std::ostream& os) const override;
+
+    // Чтение из потока: сторона x y
     void readFromStream(std::istream& is) override;
     Figure* clone() const override;
     
@@ -35,10 +37,6 @@ public:
     double getSide() const { return side; }
     double getX() const { return x; }
     double getY() const { return y; }
-    
-    // Сеттеры
-    void setSide(double s) { side = s; }
-    void setPosition(double newX, double newY) { x = newX; y = newY; }
 };
 
 #endif // PENTAGON_H

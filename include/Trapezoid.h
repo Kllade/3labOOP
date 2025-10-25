@@ -30,6 +30,8 @@ public:
     std::vector<double> getCenter() const override;
     double getArea() const override;
     void printVertices(std::ostream& os) const override;
+
+    // Чтение из потока: верхнее_основание нижнее_основание высота x y
     void readFromStream(std::istream& is) override;
     Figure* clone() const override;
     
@@ -39,12 +41,6 @@ public:
     double getHeight() const { return height; }
     double getX() const { return x; }
     double getY() const { return y; }
-    
-    // Сеттеры
-    void setTopBase(double top) { topBase = top; }
-    void setBottomBase(double bottom) { bottomBase = bottom; }
-    void setHeight(double h) { height = h; }
-    void setPosition(double newX, double newY) { x = newX; y = newY; }
 };
 
 #endif // TRAPEZOID_H

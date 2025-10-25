@@ -1,9 +1,14 @@
 #include "Trapezoid.h"
 #include <cmath>
+#include <stdexcept>
 
 // Конструкторы
-Trapezoid::Trapezoid(double top, double bottom, double h, double x, double y) 
-    : Figure("Трапеция"), topBase(top), bottomBase(bottom), height(h), x(x), y(y) {}
+Trapezoid::Trapezoid(double top, double bottom, double h, double x, double y)
+    : Figure("Трапеция"), topBase(top), bottomBase(bottom), height(h), x(x), y(y) {
+    if (top <= 0 || bottom <= 0 || h <= 0) {
+        throw std::invalid_argument("Trapezoid: основания и высота должны быть положительными");
+    }
+}
 
 Trapezoid::Trapezoid(const Trapezoid& other) 
     : Figure(other), topBase(other.topBase), bottomBase(other.bottomBase), 

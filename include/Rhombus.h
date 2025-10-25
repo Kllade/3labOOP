@@ -29,6 +29,8 @@ public:
     std::vector<double> getCenter() const override;
     double getArea() const override;
     void printVertices(std::ostream& os) const override;
+
+    // Чтение из потока: сторона угол(радианы) x y
     void readFromStream(std::istream& is) override;
     Figure* clone() const override;
     
@@ -37,11 +39,6 @@ public:
     double getAngle() const { return angle; }
     double getX() const { return x; }
     double getY() const { return y; }
-    
-    // Сеттеры
-    void setSide(double s) { side = s; }
-    void setAngle(double a) { angle = a; }
-    void setPosition(double newX, double newY) { x = newX; y = newY; }
 };
 
 #endif // RHOMBUS_H

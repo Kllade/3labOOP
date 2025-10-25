@@ -275,8 +275,8 @@ TEST(IOTest, OutputOperator) {
     std::ostringstream oss;
     oss << t;
     std::string output = oss.str();
-    
-    EXPECT_TRUE(output.find("Trapezoid") != std::string::npos);
+
+    EXPECT_TRUE(output.find("Трапеция") != std::string::npos);
     EXPECT_TRUE(output.find("9") != std::string::npos); // площадь
 }
 
