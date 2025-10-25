@@ -1,4 +1,0 @@
-/Users/user/Desktop/labs/3lab/build/CMakeFiles/lab3.dir
-/Users/user/Desktop/labs/3lab/build/CMakeFiles/tests.dir
-/Users/user/Desktop/labs/3lab/build/CMakeFiles/edit_cache.dir
-/Users/user/Desktop/labs/3lab/build/CMakeFiles/rebuild_cache.dir
