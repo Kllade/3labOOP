@@ -2,26 +2,52 @@
 #include <iostream>
 #include <algorithm>
 
+// Конструктор по умолчанию
+FigureArray::FigureArray() : data(nullptr), _size(0), _capacity(0) {}
+
+// Вспомогательная функция для изменения размера массива
+void FigureArray::resize() {
+    size_t newCapacity = (_capacity == 0) ? 1 : _capacity * 2;
+    auto newData = std::make_unique<std::unique_ptr<Figure>[]>(newCapacity);
+    for (size_t i = 0; i < _size; ++i) {
+        newData[i] = std::move(data[i]);
+    }
+    data = std::move(newData);
+    _capacity = newCapacity;
+}
+
 // Конструктор копирования
-FigureArray::FigureArray(const FigureArray& other) {
-    figures.reserve(other.figures.size());
-    for (const auto& figure : other.figures) {
-        figures.push_back(std::unique_ptr<Figure>(figure->clone()));
+FigureArray::FigureArray(const FigureArray& other)
+    : data(nullptr), _size(0), _capacity(0) {
+    if (other._size > 0) {
+        _capacity = other._capacity;
+        data = std::make_unique<std::unique_ptr<Figure>[]>(_capacity);
+        for (size_t i = 0; i < other._size; ++i) {
+            data[i] = std::unique_ptr<Figure>(other.data[i]->clone());
+        }
+        _size = other._size;
     }
 }
 
 // Конструктор перемещения
-FigureArray::FigureArray(FigureArray&& other) noexcept 
-    : figures(std::move(other.figures)) {}
+FigureArray::FigureArray(FigureArray&& other) noexcept
+    : data(std::move(other.data)), _size(other._size), _capacity(other._capacity) {
+    other._size = 0;
+    other._capacity = 0;
+}
 
 // Оператор присваивания копированием
 FigureArray& FigureArray::operator=(const FigureArray& other) {
     if (this != &other) {
-        figures.clear();
-        figures.reserve(other.figures.size());
-        for (const auto& figure : other.figures) {
-            figures.push_back(std::unique_ptr<Figure>(figure->clone()));
+        // Создаем новый массив
+        auto newData = std::make_unique<std::unique_ptr<Figure>[]>(other._capacity);
+        for (size_t i = 0; i < other._size; ++i) {
+            newData[i] = std::unique_ptr<Figure>(other.data[i]->clone());
         }
+        // Перемещаем новые данные
+        data = std::move(newData);
+        _size = other._size;
+        _capacity = other._capacity;
     }
     return *this;
 }
@@ -29,32 +55,44 @@ FigureArray& FigureArray::operator=(const FigureArray& other) {
 // Оператор присваивания перемещением
 FigureArray& FigureArray::operator=(FigureArray&& other) noexcept {
     if (this != &other) {
-        figures = std::move(other.figures);
+        data = std::move(other.data);
+        _size = other._size;
+        _capacity = other._capacity;
+        other._size = 0;
+        other._capacity = 0;
     }
     return *this;
 }
 
 // Добавление фигуры
 void FigureArray::addFigure(std::unique_ptr<Figure> figure) {
-    figures.push_back(std::move(figure));
+    if (_size == _capacity) {
+        resize();
+    }
+    data[_size++] = std::move(figure);
 }
 
 // Удаление фигуры по индексу
 void FigureArray::removeFigure(size_t index) {
-    if (index < figures.size()) {
-        figures.erase(figures.begin() + index);
+    if (index < _size) {
+        // Сдвигаем все элементы после удаленного влево
+        for (size_t i = index; i < _size - 1; ++i) {
+            data[i] = std::move(data[i + 1]);
+        }
+        data[_size - 1].reset(); // Очищаем последний элемент
+        --_size;
     }
 }
 
 // Размер массива
 size_t FigureArray::size() const {
-    return figures.size();
+    return _size;
 }
 
 // Получение фигуры по индексу
 Figure* FigureArray::getFigure(size_t index) const {
-    if (index < figures.size()) {
-        return figures[index].get();
+    if (index < _size) {
+        return data[index].get();
     }
     return nullptr;
 }
@@ -62,24 +100,24 @@ Figure* FigureArray::getFigure(size_t index) const {
 // Общая площадь всех фигур
 double FigureArray::getTotalArea() const {
     double total = 0.0;
-    for (const auto& figure : figures) {
-        total += figure->getArea();
+    for (size_t i = 0; i < _size; ++i) {
+        total += data[i]->getArea();
     }
     return total;
 }
 
 // Вывод всех фигур
 void FigureArray::printAllFigures() const {
-    for (size_t i = 0; i < figures.size(); ++i) {
+    for (size_t i = 0; i < _size; ++i) {
         std::cout << "Фигура " << i + 1 << ":" << std::endl;
-        std::cout << *figures[i] << std::endl;
+        std::cout << *data[i] << std::endl;
     }
 }
 
 // Вывод центров всех фигур
 void FigureArray::printCenters() const {
-    for (size_t i = 0; i < figures.size(); ++i) {
-        auto center = figures[i]->getCenter();
+    for (size_t i = 0; i < _size; ++i) {
+        auto center = data[i]->getCenter();
         std::cout << "Центр фигуры " << i + 1 << ": (";
         for (size_t j = 0; j < center.size(); ++j) {
             if (j > 0) std::cout << ", ";
@@ -91,7 +129,7 @@ void FigureArray::printCenters() const {
 
 // Вывод площадей всех фигур
 void FigureArray::printAreas() const {
-    for (size_t i = 0; i < figures.size(); ++i) {
-        std::cout << "Площадь фигуры " << i + 1 << ": " << figures[i]->getArea() << std::endl;
+    for (size_t i = 0; i < _size; ++i) {
+        std::cout << "Площадь фигуры " << i + 1 << ": " << data[i]->getArea() << std::endl;
     }
 }

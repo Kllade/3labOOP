@@ -2,16 +2,18 @@
 #define FIGUREARRAY_H
 
 #include "Figure.h"
-#include <vector>
 #include <memory>
 
 class FigureArray {
 private:
-    std::vector<std::unique_ptr<Figure>> figures;
+    std::unique_ptr<std::unique_ptr<Figure>[]> data;
+    size_t _size;
+    size_t _capacity;
+    void resize();
 
 public:
     // Конструкторы
-    FigureArray() = default;
+    FigureArray();
     FigureArray(const FigureArray& other);
     FigureArray(FigureArray&& other) noexcept;
     
@@ -33,12 +35,6 @@ public:
     void printAllFigures() const;
     void printCenters() const;
     void printAreas() const;
-
-    // Итераторы
-    auto begin() { return figures.begin(); }
-    auto end() { return figures.end(); }
-    auto begin() const { return figures.cbegin(); }
-    auto end() const { return figures.cend(); }
 };
 
 #endif // FIGUREARRAY_H
